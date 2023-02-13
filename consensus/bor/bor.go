@@ -772,6 +772,26 @@ func (c *Bor) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header *typ
 	return block, nil
 }
 
+func (c *Bor) SyncVerify(header *types.Header) error {
+	headerNumber := header.Number.Uint64()
+	if (headerNumber+1)%c.config.Sprint == 0 {
+		newValidators, err := c.GetCurrentValidators(header.ParentHash, headerNumber+1)
+		if err != nil {
+			return errors.New("unknown validators")
+		}
+		extra := []byte{}
+		// sort validator by address
+		sort.Sort(ValidatorsByAddress(newValidators))
+		for _, validator := range newValidators {
+			extra = append(extra, validator.HeaderBytes()...)
+		}
+		if bytes.Compare(extra, header.Extra[extraVanity:len(header.Extra)-extraSeal]) != 0 {
+			return errors.New("error validators")
+		}
+	}
+	return nil
+}
+
 // Authorize injects a private key into the consensus engine to mint new blocks
 // with.
 func (c *Bor) Authorize(signer common.Address, signFn SignerFn) {

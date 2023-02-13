@@ -81,6 +81,9 @@ type Engine interface {
 	// rules of a particular engine. The changes are executed inline.
 	Prepare(chain ChainHeaderReader, header *types.Header) error
 
+	//SyncVerify  Header Synchronization Detection, which performs checks that depend on block execution
+	SyncVerify(header *types.Header) error
+
 	// Finalize runs any post-transaction state modifications (e.g. block rewards)
 	// but does not assemble the block.
 	//
