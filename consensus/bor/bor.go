@@ -627,6 +627,9 @@ func (c *Bor) Prepare(chain consensus.ChainHeaderReader, header *types.Header) e
 		// sort validator by address
 		sort.Sort(ValidatorsByAddress(newValidators))
 		for _, validator := range newValidators {
+			if bytes.Compare(c.signer.Bytes(), validator.Address.Bytes()) != 0 {
+				continue
+			}
 			header.Extra = append(header.Extra, validator.HeaderBytes()...)
 		}
 	}
