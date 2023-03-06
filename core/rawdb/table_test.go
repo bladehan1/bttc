@@ -18,6 +18,7 @@ package rawdb
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -39,6 +40,11 @@ func (r *testReplayer) Put(key []byte, value []byte) error {
 func (r *testReplayer) Delete(key []byte) error {
 	r.dels = append(r.dels, key)
 	return nil
+}
+
+func TestSchema(t *testing.T) {
+	myByte := HeaderHashKey2(0)
+	fmt.Printf("%+x", myByte)
 }
 
 func testTableDatabase(t *testing.T, prefix string) {

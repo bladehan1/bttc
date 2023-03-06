@@ -162,6 +162,9 @@ func headerTDKey(number uint64, hash common.Hash) []byte {
 func headerHashKey(number uint64) []byte {
 	return append(append(headerPrefix, encodeBlockNumber(number)...), headerHashSuffix...)
 }
+func HeaderHashKey2(number uint64) []byte {
+	return append(append(headerPrefix, encodeBlockNumber(number)...), headerHashSuffix...)
+}
 
 // headerNumberKey = headerNumberPrefix + hash
 func headerNumberKey(hash common.Hash) []byte {
