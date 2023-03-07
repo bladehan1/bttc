@@ -807,7 +807,7 @@ func MakeDataDir(ctx *cli.Context) string {
 		}
 		if ctx.GlobalBool(DonauFlag.Name) || ctx.GlobalBool(BttcMainnetFlag.Name) {
 			homeDir, _ := os.UserHomeDir()
-			return filepath.Join(homeDir, "/.bor/data")
+			return filepath.Join(homeDir, "/.bttc/data")
 		}
 		return path
 	}
@@ -1310,10 +1310,10 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "goerli")
 	case ctx.GlobalBool(DonauFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		homeDir, _ := os.UserHomeDir()
-		cfg.DataDir = filepath.Join(homeDir, "/.bor/data")
+		cfg.DataDir = filepath.Join(homeDir, "/.bttc/data")
 	case ctx.GlobalBool(BttcMainnetFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		homeDir, _ := os.UserHomeDir()
-		cfg.DataDir = filepath.Join(homeDir, "/.bor/data")
+		cfg.DataDir = filepath.Join(homeDir, "/.bttc/data")
 	}
 }
 
