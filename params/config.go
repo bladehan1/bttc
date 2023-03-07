@@ -271,8 +271,10 @@ var (
 	BttcMainnetChainConfig = &ChainConfig{
 		ChainID:             big.NewInt(199),
 		HomesteadBlock:      big.NewInt(0),
-		EIP150Block:         big.NewInt(0),
+		DAOForkBlock:        nil,
+		DAOForkSupport:      true,
 		EIP150Hash:          common.HexToHash("0x0000000000000000000000000000000000000000000000000000000000000000"),
+		EIP150Block:         big.NewInt(0),
 		EIP155Block:         big.NewInt(0),
 		EIP158Block:         big.NewInt(0),
 		ByzantiumBlock:      big.NewInt(0),

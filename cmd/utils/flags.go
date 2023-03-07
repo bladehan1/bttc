@@ -805,7 +805,7 @@ func MakeDataDir(ctx *cli.Context) string {
 		if ctx.GlobalBool(GoerliFlag.Name) {
 			return filepath.Join(path, "goerli")
 		}
-		if ctx.GlobalBool(DonauFlag.Name) {
+		if ctx.GlobalBool(DonauFlag.Name) || ctx.GlobalBool(BttcMainnetFlag.Name) {
 			homeDir, _ := os.UserHomeDir()
 			return filepath.Join(homeDir, "/.bor/data")
 		}
@@ -1658,13 +1658,13 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		SetDNSDiscoveryDefaults(cfg, params.GoerliGenesisHash)
 	case ctx.GlobalBool(DonauFlag.Name):
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = 80001
+			cfg.NetworkId = 1029
 		}
 		cfg.Genesis = core.DefaultDonauGenesisBlock()
 		SetDNSDiscoveryDefaults(cfg, params.DonauGenesisHash)
 	case ctx.GlobalBool(BttcMainnetFlag.Name):
 		if !ctx.GlobalIsSet(BttcMainnetFlag.Name) {
-			cfg.NetworkId = 137
+			cfg.NetworkId = 199
 		}
 		cfg.Genesis = core.DefaultBttcMainnetGenesisBlock()
 		SetDNSDiscoveryDefaults(cfg, params.BttcMainnetGenesisHash)
