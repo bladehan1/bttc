@@ -805,10 +805,6 @@ func MakeDataDir(ctx *cli.Context) string {
 		if ctx.GlobalBool(GoerliFlag.Name) {
 			return filepath.Join(path, "goerli")
 		}
-		if ctx.GlobalBool(DonauFlag.Name) || ctx.GlobalBool(BttcMainnetFlag.Name) {
-			homeDir, _ := os.UserHomeDir()
-			return filepath.Join(homeDir, "/.bttc/data")
-		}
 		return path
 	}
 	Fatalf("Cannot determine default data directory, please set manually (--datadir)")

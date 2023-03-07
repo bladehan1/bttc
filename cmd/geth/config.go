@@ -345,7 +345,7 @@ func setDefaultDonauGethConfig(ctx *cli.Context, config *gethConfig) {
 	config.Node.HTTPVirtualHosts = []string{"*"}
 	config.Node.HTTPCors = []string{"*"}
 	config.Node.HTTPPort = 8545
-	config.Node.IPCPath = utils.MakeDataDir(ctx) + "/bor.ipc"
+	config.Node.IPCPath = utils.MakeDataDir(ctx) + "/bttc.ipc"
 	config.Node.HTTPModules = []string{"eth", "net", "web3", "txpool", "bor"}
 	config.Eth.SyncMode = downloader.FullSync
 	config.Eth.NetworkId = 1029
@@ -372,7 +372,7 @@ func setDefaultBttcMainnetGethConfig(ctx *cli.Context, config *gethConfig) {
 	config.Node.HTTPVirtualHosts = []string{"*"}
 	config.Node.HTTPCors = []string{"*"}
 	config.Node.HTTPPort = 8545
-	config.Node.IPCPath = utils.MakeDataDir(ctx) + "/bor.ipc"
+	config.Node.IPCPath = utils.MakeDataDir(ctx) + "/bttc.ipc"
 	config.Node.HTTPModules = []string{"eth", "net", "web3", "txpool", "bor"}
 	config.Eth.SyncMode = downloader.FullSync
 	config.Eth.NetworkId = 199
