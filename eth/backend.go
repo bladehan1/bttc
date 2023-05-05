@@ -594,6 +594,7 @@ func (s *Ethereum) Stop() error {
 
 	rawdb.PopUncleanShutdownMarker(s.chainDb)
 	s.chainDb.Close()
+	myconst.MainCloseChan()
 	s.eventMux.Stop()
 
 	return nil
