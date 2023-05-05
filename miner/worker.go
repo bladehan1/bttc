@@ -24,6 +24,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/ethereum/go-ethereum/myconst"
+
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
@@ -638,7 +640,9 @@ func (w *worker) resultLoop() {
 				logs = append(logs, receipt.Logs...)
 			}
 			// Commit block and state to database.
+			myconst.CloseSync("WriteBlockWithState")
 			_, err := w.chain.WriteBlockWithState(block, receipts, logs, task.state, true)
+			myconst.PassCloseChan("WriteBlockWithState")
 			if err != nil {
 				log.Error("Failed writing block to chain", "err", err)
 				continue
