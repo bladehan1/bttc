@@ -25,6 +25,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ethereum/go-ethereum/myconst"
+
 	"github.com/VictoriaMetrics/fastcache"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -522,6 +524,7 @@ func (db *Database) Dereference(root common.Hash) {
 	nodes, storage, start := len(db.dirties), db.dirtiesSize, time.Now()
 	db.dereference(root, common.Hash{})
 
+	myconst.PassCloseChan("Dereference")
 	db.gcnodes += uint64(nodes - len(db.dirties))
 	db.gcsize += storage - db.dirtiesSize
 	db.gctime += time.Since(start)
@@ -576,6 +579,7 @@ func (db *Database) dereference(child common.Hash, parent common.Hash) {
 		node.forChilds(func(hash common.Hash) {
 			db.dereference(hash, child)
 		})
+		myconst.CloseSync()
 		delete(db.dirties, child)
 		db.dirtiesSize -= common.StorageSize(common.HashLength + int(node.size))
 		if node.children != nil {
@@ -718,6 +722,7 @@ func (db *Database) Commit(node common.Hash, report bool, callback func(common.H
 		log.Error("Failed to commit trie from trie database", "err", err)
 		return err
 	}
+	myconst.PassCloseChan("Commit")
 	// Trie mostly committed to disk, flush any batch leftovers
 	if err := batch.Write(); err != nil {
 		log.Error("Failed to write trie to disk", "err", err)
@@ -755,6 +760,7 @@ func (db *Database) Commit(node common.Hash, report bool, callback func(common.H
 // commit is the private locked version of Commit.
 func (db *Database) commit(hash common.Hash, batch ethdb.Batch, uncacher *cleaner, callback func(common.Hash)) error {
 	// If the node does not exist, it's a previously committed node
+	myconst.CloseSync()
 	node, ok := db.dirties[hash]
 	if !ok {
 		return nil
