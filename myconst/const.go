@@ -48,7 +48,7 @@ func MainCloseChan() {
 			log.Info("blade recover MainCloseChan")
 		}
 	}()
-	time.Sleep(time.Second)
+	time.Sleep(2 * time.Second)
 	close(MyChan)
 	log.Info("blade MainCloseChan")
 }
