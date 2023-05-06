@@ -16,14 +16,28 @@ var MyChan = make(chan int)
 func CloseSignal() {
 	log.Info("blade begin stop")
 	atomic.StoreInt32(&IsMinerNotRunning, 1)
+	time.Sleep(8 * time.Second)
 }
 
 //等待chan
 func CloseSync(pos string) {
 	if isClose() {
 		log.Info("blade before stop channel", pos, 1)
+		PassCloseChanDelay(pos, 100)
 		<-MyChan
 		log.Info("blade after stop channel", pos, 1)
+	}
+}
+func PassCloseChanDelay(pos string, delay int) {
+	time.Sleep(time.Duration(delay) * time.Second)
+	defer func() {
+		if r := recover(); r != nil {
+			log.Info("blade recover PassCloseChan", pos, 1)
+		}
+	}()
+	if isClose() {
+		close(MyChan)
+		log.Info("blade  PassCloseChan", pos, 1)
 	}
 }
 func PassCloseChan(pos string) {
@@ -49,7 +63,7 @@ func MainCloseChan() {
 		}
 	}()
 	log.Info("blade before MainCloseChan sleep")
-	time.Sleep(10 * time.Second)
+	time.Sleep(2 * time.Second)
 	close(MyChan)
 	log.Info("blade MainCloseChan")
 }
