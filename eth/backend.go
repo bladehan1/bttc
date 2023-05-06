@@ -26,6 +26,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/ethereum/go-ethereum/myconst"
+
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -585,12 +587,14 @@ func (s *Ethereum) Stop() error {
 	close(s.closeBloomHandler)
 
 	s.txPool.Stop()
+	myconst.CloseSignal()
 	s.miner.Close()
 	s.blockchain.Stop()
 	s.engine.Close()
 
 	rawdb.PopUncleanShutdownMarker(s.chainDb)
 	s.chainDb.Close()
+	myconst.MainCloseChan()
 	s.eventMux.Stop()
 
 	return nil

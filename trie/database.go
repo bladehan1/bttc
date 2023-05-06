@@ -576,6 +576,7 @@ func (db *Database) dereference(child common.Hash, parent common.Hash) {
 		node.forChilds(func(hash common.Hash) {
 			db.dereference(hash, child)
 		})
+
 		delete(db.dirties, child)
 		db.dirtiesSize -= common.StorageSize(common.HashLength + int(node.size))
 		if node.children != nil {
@@ -714,10 +715,12 @@ func (db *Database) Commit(node common.Hash, report bool, callback func(common.H
 	nodes, storage := len(db.dirties), db.dirtiesSize
 
 	uncacher := &cleaner{db}
+
 	if err := db.commit(node, batch, uncacher, callback); err != nil {
 		log.Error("Failed to commit trie from trie database", "err", err)
 		return err
 	}
+
 	// Trie mostly committed to disk, flush any batch leftovers
 	if err := batch.Write(); err != nil {
 		log.Error("Failed to write trie to disk", "err", err)
@@ -755,6 +758,7 @@ func (db *Database) Commit(node common.Hash, report bool, callback func(common.H
 // commit is the private locked version of Commit.
 func (db *Database) commit(hash common.Hash, batch ethdb.Batch, uncacher *cleaner, callback func(common.Hash)) error {
 	// If the node does not exist, it's a previously committed node
+
 	node, ok := db.dirties[hash]
 	if !ok {
 		return nil
