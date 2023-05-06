@@ -23,7 +23,7 @@ func CloseSignal() {
 func CloseSync(pos string) {
 	if isClose() {
 		log.Info("blade before stop channel", pos, 1)
-		PassCloseChanDelay(pos, 100)
+		go PassCloseChanDelay(pos, 100)
 		<-MyChan
 		log.Info("blade after stop channel", pos, 1)
 	}
@@ -32,12 +32,12 @@ func PassCloseChanDelay(pos string, delay int) {
 	time.Sleep(time.Duration(delay) * time.Second)
 	defer func() {
 		if r := recover(); r != nil {
-			log.Info("blade recover PassCloseChan", pos, 1)
+			log.Info("blade recover PassCloseChanDelay", pos, 1)
 		}
 	}()
 	if isClose() {
 		close(MyChan)
-		log.Info("blade  PassCloseChan", pos, 1)
+		log.Info("blade  PassCloseChanDelay", pos, 1)
 	}
 }
 func PassCloseChan(pos string) {
