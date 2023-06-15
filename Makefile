@@ -48,7 +48,8 @@ ios:
 
 test: all
 	# $(GORUN) build/ci.go test
-	go test  -shuffle=on -cover -short -coverprofile=cover.out -covermode=atomic $(TESTALL)
+	go test github.com/ethereum/go-ethereum/consensus/bor
+	go test github.com/ethereum/go-ethereum/tests/bor
 
 lint: ## Run linters.
 	$(GORUN) build/ci.go lint
