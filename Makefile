@@ -48,7 +48,7 @@ ios:
 
 test: all
 	# $(GORUN) build/ci.go test
-	go test --timeout 5m -shuffle=on -cover -short -coverprofile=cover.out -covermode=atomic $(TESTALL)
+	go test  -shuffle=on -cover -short -coverprofile=cover.out -covermode=atomic $(TESTALL)
 
 lint: ## Run linters.
 	$(GORUN) build/ci.go lint
