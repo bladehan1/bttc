@@ -12,6 +12,7 @@ GOBIN = ./build/bin
 GO ?= latest
 GORUN = env GO111MODULE=on go run
 GOPATH = $(shell go env GOPATH)
+TESTALL = $$(go list ./... | grep -v go-ethereum/cmd/)
 
 bttc:
 	$(GORUN) build/ci.go install ./cmd/geth
@@ -47,8 +48,7 @@ ios:
 
 test: all
 	# $(GORUN) build/ci.go test
-	go test github.com/ethereum/go-ethereum/consensus/bor
-	go test github.com/ethereum/go-ethereum/tests/bor
+	go test --timeout 5m -shuffle=on -cover -short -coverprofile=cover.out -covermode=atomic $(TESTALL)
 
 lint: ## Run linters.
 	$(GORUN) build/ci.go lint
