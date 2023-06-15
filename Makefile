@@ -12,6 +12,7 @@ GOBIN = ./build/bin
 GO ?= latest
 GORUN = env GO111MODULE=on go run
 GOPATH = $(shell go env GOPATH)
+TESTALL = $$(go list ./... | grep -v go-ethereum/cmd/)
 
 bttc:
 	$(GORUN) build/ci.go install ./cmd/geth
