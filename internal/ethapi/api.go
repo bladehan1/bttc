@@ -1446,20 +1446,31 @@ func newRPCPendingTransaction(tx *types.Transaction, current *types.Header, conf
 // newRPCTransactionFromBlockIndex returns a transaction that will serialize to the RPC representation.
 func newRPCTransactionFromBlockIndex(b *types.Block, index uint64, db ethdb.Database) *RPCTransaction {
 	txs := b.Transactions()
+	var borReceipt *types.Receipt
 
-	borReceipt := rawdb.ReadBorReceipt(db, b.Hash(), b.NumberU64())
-	if borReceipt != nil {
-		tx, _, _, _ := rawdb.ReadBorTransaction(db, borReceipt.TxHash)
+	// Read bor receipts if a state-sync transaction is requested
+	if index == uint64(len(txs)) {
+		borReceipt = rawdb.ReadBorReceipt(db, b.Hash(), b.NumberU64())
+		if borReceipt != nil {
+			tx, _, _, _ := rawdb.ReadBorTransaction(db, borReceipt.TxHash)
 
-		if tx != nil {
-			txs = append(txs, tx)
+			if tx != nil {
+				txs = append(txs, tx)
+			}
 		}
 	}
 
 	if index >= uint64(len(txs)) {
 		return nil
 	}
-	return newRPCTransaction(txs[index], b.Hash(), b.NumberU64(), index, b.BaseFee())
+	rpcTx := newRPCTransaction(txs[index], b.Hash(), b.NumberU64(), index, b.BaseFee())
+
+	// If the transaction is a bor transaction, we need to set the hash to the derived bor tx hash. BorTx is always the last index.
+	if borReceipt != nil && index == uint64(len(txs)-1) {
+		rpcTx.Hash = borReceipt.TxHash
+	}
+
+	return rpcTx
 }
 
 // newRPCRawTransactionFromBlockIndex returns the bytes of a transaction given a block and a transaction index.
