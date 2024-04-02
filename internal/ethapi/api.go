@@ -1452,10 +1452,12 @@ func newRPCTransactionFromBlockIndex(b *types.Block, index uint64, db ethdb.Data
 	if index == uint64(len(txs)) {
 		borReceipt = rawdb.ReadBorReceipt(db, b.Hash(), b.NumberU64())
 		if borReceipt != nil {
-			tx, _, _, _ := rawdb.ReadBorTransaction(db, borReceipt.TxHash)
+			if borReceipt.TxHash != (common.Hash{}) {
+				tx, _, _, _ := rawdb.ReadBorTransaction(db, borReceipt.TxHash)
 
-			if tx != nil {
-				txs = append(txs, tx)
+				if tx != nil {
+					txs = append(txs, tx)
+				}
 			}
 		}
 	}
