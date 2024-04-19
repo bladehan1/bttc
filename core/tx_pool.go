@@ -19,6 +19,7 @@ package core
 import (
 	"container/heap"
 	"errors"
+	"fmt"
 	"math"
 	"math/big"
 	"sort"
@@ -599,6 +600,11 @@ func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
 	// Reject transactions over defined size to prevent DOS attacks
 	if uint64(tx.Size()) > txMaxSize {
 		return ErrOversizedData
+	}
+	// Check whether the init code size has been exceeded.
+	// (TODO): Add a hardfork check here while pulling upstream changes.
+	if tx.To() == nil && len(tx.Data()) > params.MaxInitCodeSize {
+		return fmt.Errorf("%w: code size %v limit %v", ErrMaxInitCodeSizeExceeded, len(tx.Data()), params.MaxInitCodeSize)
 	}
 	// Transactions can't be negative. This may never happen using RLP decoded
 	// transactions but may occur if you create a transaction using the RPC.
@@ -1256,6 +1262,9 @@ func (pool *TxPool) runReorg(done chan struct{}, reset *txpoolResetRequest, dirt
 	// Update all accounts to the latest known pending nonce
 	for addr, list := range pool.pending {
 		highestPending := list.LastElement()
+		if highestPending == nil {
+			continue
+		}
 		pool.pendingNonces.set(addr, highestPending.Nonce()+1)
 	}
 	dropBetweenReorgHistogram.Update(int64(pool.changesSinceReorg))
