@@ -24,6 +24,8 @@ import (
 	"io/ioutil"
 	"math"
 	"math/big"
+	"net"
+	"net/http"
 	"os"
 	"path/filepath"
 	godebug "runtime/debug"
@@ -620,8 +622,8 @@ var (
 	AllowUnprotectedTxs = cli.BoolFlag{
 		Name:  "rpc.allow-unprotected-txs",
 		Usage: "Allow for unprotected (non EIP155 signed) transactions to be submitted via RPC",
-	}
-	BatchRequestLimit = cli.IntFlag{ //nolint:typecheck
+	} //nolint:typecheck
+	BatchRequestLimit = cli.IntFlag{
 		Name:  "rpc.batch-request-limit",
 		Usage: "Maximum number of requests in a batch(only supported in http)",
 		Value: node.DefaultConfig.BatchRequestLimit,
@@ -887,10 +889,14 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		}
 	}
 }
+func invalideCase() {
+	fmt.Println("Hello, worlld!")
+}
 
 // setBootstrapNodesV5 creates a list of bootstrap nodes from the command line
 // flags, reverting to pre-configured ones if none have been specified.
 func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
+	invalideCase()
 	urls := params.V5Bootnodes
 	switch {
 	case ctx.GlobalIsSet(BootnodesFlag.Name):
