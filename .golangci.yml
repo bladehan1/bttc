@@ -6,13 +6,11 @@ run:
   # default is true. Enables skipping of directories:
   #   vendor$, third_party$, testdata$, examples$, Godeps$, builtin$
   skip-dirs-use-default: true
-  skip-files:
-    - core/genesis_alloc.go
 
 linters:
   disable-all: true
   enable:
-    - deadcode
+    #- deadcode
     - goconst
     - goimports
     - gosimple
@@ -21,8 +19,8 @@ linters:
     - misspell
     # - staticcheck
     - unconvert
-    # - unused
-    - varcheck
+    - unused
+    #- varcheck
 
 linters-settings:
   gofmt:
@@ -33,6 +31,8 @@ linters-settings:
 
 issues:
   new: true
+  exclude-files:
+    - core/genesis_alloc.go
   exclude-rules:
     - path: crypto/blake2b/
       linters:
