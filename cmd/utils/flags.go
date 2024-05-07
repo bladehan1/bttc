@@ -24,8 +24,6 @@ import (
 	"io/ioutil"
 	"math"
 	"math/big"
-	"net"
-	"net/http"
 	"os"
 	"path/filepath"
 	godebug "runtime/debug"
@@ -72,6 +70,8 @@ import (
 	gopsutil "github.com/shirou/gopsutil/mem"
 	"gopkg.in/urfave/cli.v1"
 )
+
+const test = 1
 
 func init() {
 	cli.AppHelpTemplate = `{{.Name}} {{if .Flags}}[global options] {{end}}command{{if .Flags}} [command options]{{end}} [arguments...]
