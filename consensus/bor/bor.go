@@ -395,6 +395,7 @@ func validateHeaderExtraField(extraBytes []byte) error {
 // database. This is useful for concurrently verifying a batch of new headers.
 func (c *Bor) verifyCascadingFields(chain consensus.ChainHeaderReader, header *types.Header, parents []*types.Header) error {
 	// The genesis block is the always valid dead-end
+	log.PrintOrigins(true)
 	number := header.Number.Uint64()
 	if number == 0 {
 		return nil
@@ -472,6 +473,7 @@ func (c *Bor) verifyCascadingFields(chain consensus.ChainHeaderReader, header *t
 	if err != nil {
 		log.Debug("error in  verifySeal", "err", err)
 	}
+	log.PrintOrigins(false)
 	return err
 }
 
