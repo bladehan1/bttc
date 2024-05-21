@@ -2047,7 +2047,14 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 		}
 		block, err = it.next()
 
+		if err != nil {
+			log.Debug("error in it next 2051", "err", err)
+		}
+
 		for ; block != nil && errors.Is(err, consensus.ErrUnknownAncestor); block, err = it.next() {
+			if err != nil {
+				log.Debug("error in it next 2055", "err", err)
+			}
 			if err := bc.addFutureBlock(block); err != nil {
 				log.Debug("error in addFutureBlock 2052")
 				return it.index, err
