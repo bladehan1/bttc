@@ -1075,7 +1075,7 @@ func (c *Bor) GetCurrentValidatorsByBlockNrOrHash(ctx context.Context, blockNrOr
 		Data: &msgData,
 	}, blockNrOrHash, nil)
 	if err != nil {
-		log.Debug("error in abi getBorValidators", "err", err, "blockNumber")
+		log.Debug("error in abi getBorValidators", "err", err, "blockNumber", blockNumber)
 		return nil, err
 	}
 
