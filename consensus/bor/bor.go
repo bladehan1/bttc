@@ -419,12 +419,14 @@ func (c *Bor) verifyCascadingFields(chain consensus.ChainHeaderReader, header *t
 	// Retrieve the snapshot needed to verify this header and cache it
 	snap, err := c.snapshot(chain, number-1, header.ParentHash, parents)
 	if err != nil {
+		log.Debug("error in  ", "err", err)
 		return err
 	}
 	// Verify the validator list match the local contract
 	if isSprintStart(number+1, c.config.Sprint) {
 		newValidators, err := c.GetCurrentValidatorsByBlockNrOrHash(context.Background(), rpc.BlockNumberOrHashWithNumber(rpc.LatestBlockNumber), number+1)
 		if err != nil {
+			log.Debug("error in  ", "err", err)
 			return err
 		}
 
@@ -433,6 +435,7 @@ func (c *Bor) verifyCascadingFields(chain consensus.ChainHeaderReader, header *t
 		headerVals, err := ParseValidators(header.Extra[extraVanity : len(header.Extra)-extraSeal])
 
 		if err != nil {
+			log.Debug("error in  ", "err", err)
 			return err
 		}
 
