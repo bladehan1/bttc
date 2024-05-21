@@ -119,12 +119,12 @@ func (it *insertIterator) next() (*types.Block, error) {
 		log.Debug("error in verify header", "err", it.errors[it.index])
 		return it.chain[it.index], it.errors[it.index]
 	}
-	log.PrintOrigins(false)
 	// Block header valid, run body validation and return
 	block, err := it.chain[it.index], it.validator.ValidateBody(it.chain[it.index])
 	if err != nil {
 		log.Debug("error in ValidateBody", "err", it.errors[it.index])
 	}
+	log.PrintOrigins(false)
 	return block, err
 }
 
