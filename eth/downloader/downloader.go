@@ -1727,7 +1727,8 @@ func (d *Downloader) importBlockResults(results []*fetchResult) error {
 		if index < len(results) {
 			log.Debug("Downloaded item processing failed", "number", results[index].Header.Number, "hash", results[index].Header.Hash(), "err", err)
 			stackStr := string(debug.Stack())
-			log.Debug("stackStr:", stackStr)
+			log.Debug("stackStr", fmt.Sprintf("Error:%+v\n", err))
+			//log.Debug("stackStr:", stackStr)
 		} else {
 			// The InsertChain method in blockchain.go will sometimes return an out-of-bounds index,
 			// when it needs to preprocess blocks to import a sidechain.
