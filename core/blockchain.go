@@ -1878,7 +1878,9 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 			activeState.StopPrefetcher()
 		}
 	}()
-
+	if err != nil {
+		log.Debug("error in end before for", "err", err)
+	}
 	for ; block != nil && err == nil || err == ErrKnownBlock; block, err = it.next() {
 		// If the chain is terminating, stop processing blocks
 		if err != nil {
@@ -1891,6 +1893,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 		// If the header is a banned one, straight out abort
 		if BadHashes[block.Hash()] {
 			bc.reportBlock(block, nil, ErrBannedHash)
+			log.Debug("error in ", "err", err)
 			return it.index, ErrBannedHash
 		}
 		// If the block is known (in the middle of the chain), it's a special case for
@@ -2061,8 +2064,13 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 
 		dirty, _ := bc.stateCache.TrieDB().Size()
 		stats.report(chain, it.index, dirty)
+		if err != nil {
+			log.Debug("error in in fore", "err", err)
+		}
 	}
-
+	if err != nil {
+		log.Debug("error in end after for", "err", err)
+	}
 	// Any blocks remaining here? The only ones we care about are the future ones
 	if block != nil && errors.Is(err, consensus.ErrFutureBlock) {
 		if err := bc.addFutureBlock(block); err != nil {
