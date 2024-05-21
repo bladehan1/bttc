@@ -1922,6 +1922,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 		}
 		statedb, err := state.New(parent.Root, bc.stateCache, bc.snaps)
 		if err != nil {
+			log.Debug("error in state.New")
 			return it.index, err
 		}
 
@@ -1994,6 +1995,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 		status, err := bc.writeBlockWithState(block, receipts, logs, statedb, false)
 		atomic.StoreUint32(&followupInterrupt, 1)
 		if err != nil {
+			log.Debug("error in writeBlockWithState")
 			return it.index, err
 		}
 		// Update the metrics touched during block commit
@@ -2040,18 +2042,23 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 	// Any blocks remaining here? The only ones we care about are the future ones
 	if block != nil && errors.Is(err, consensus.ErrFutureBlock) {
 		if err := bc.addFutureBlock(block); err != nil {
+			log.Debug("error in addFutureBlock 2045")
 			return it.index, err
 		}
 		block, err = it.next()
 
 		for ; block != nil && errors.Is(err, consensus.ErrUnknownAncestor); block, err = it.next() {
 			if err := bc.addFutureBlock(block); err != nil {
+				log.Debug("error in addFutureBlock 2052")
 				return it.index, err
 			}
 			stats.queued++
 		}
 	}
 	stats.ignored += it.remaining()
+	if err != nil {
+		log.Debug("error in end", "err", err)
+	}
 
 	return it.index, err
 }
