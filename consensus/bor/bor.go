@@ -303,7 +303,9 @@ func (c *Bor) VerifyHeaders(chain consensus.ChainHeaderReader, headers []*types.
 	go func() {
 		for i, header := range headers {
 			err := c.verifyHeader(chain, header, headers[:i])
-
+			if err != nil {
+				log.Debug("error in verifyHeader go func", "err", err)
+			}
 			select {
 			case <-abort:
 				return
@@ -319,6 +321,7 @@ func (c *Bor) VerifyHeaders(chain consensus.ChainHeaderReader, headers []*types.
 // looking those up from the database. This is useful for concurrently verifying
 // a batch of new headers.
 func (c *Bor) verifyHeader(chain consensus.ChainHeaderReader, header *types.Header, parents []*types.Header) error {
+	log.PrintOrigins(true)
 	if header.Number == nil {
 		return errUnknownBlock
 	}
@@ -330,6 +333,7 @@ func (c *Bor) verifyHeader(chain consensus.ChainHeaderReader, header *types.Head
 	}
 
 	if err := validateHeaderExtraField(header.Extra); err != nil {
+		log.Debug("error in  validateHeaderExtraField", "err", err)
 		return err
 	}
 
@@ -360,14 +364,16 @@ func (c *Bor) verifyHeader(chain consensus.ChainHeaderReader, header *types.Head
 	}
 	// If all checks passed, validate any special fields for hard forks
 	if err := misc.VerifyForkHashes(chain.Config(), header, false); err != nil {
+		log.Debug("error in  VerifyForkHashes", "err", err)
 		return err
 	}
 
 	// All basic checks passed, verify cascading fields
 	err := c.verifyCascadingFields(chain, header, parents)
 	if err != nil {
-		log.Debug("error in  verifyCascadingFields")
+		log.Debug("error in  verifyCascadingFields", "err", err)
 	}
+	log.PrintOrigins(false)
 	return err
 }
 
@@ -461,7 +467,7 @@ func (c *Bor) verifyCascadingFields(chain consensus.ChainHeaderReader, header *t
 	// All basic checks passed, verify the seal and return
 	err = c.verifySeal(chain, header, parents)
 	if err != nil {
-		log.Debug("error in  verifySeal")
+		log.Debug("error in  verifySeal", "err", err)
 	}
 	return err
 }
