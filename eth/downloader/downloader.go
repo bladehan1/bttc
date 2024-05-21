@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
-	"runtime/debug"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -1726,7 +1725,7 @@ func (d *Downloader) importBlockResults(results []*fetchResult) error {
 	if index, err := d.blockchain.InsertChain(blocks); err != nil {
 		if index < len(results) {
 			log.Debug("Downloaded item processing failed", "number", results[index].Header.Number, "hash", results[index].Header.Hash(), "err", err)
-			stackStr := string(debug.Stack())
+			//stackStr := string(debug.Stack())
 			log.Debug("stackStr", fmt.Sprintf("Error:%+v\n", err))
 			//log.Debug("stackStr:", stackStr)
 		} else {
