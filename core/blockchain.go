@@ -1749,6 +1749,7 @@ func (bc *BlockChain) InsertChainWithoutSealVerification(block *types.Block) (in
 // is imported, but then new canon-head is added before the actual sidechain
 // completes, then the historic state could be pruned again
 func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, error) {
+	log.PrintOrigins(true)
 	// If the chain is terminating, don't even bother starting up.
 	if bc.insertStopped() {
 		return 0, nil
@@ -1782,6 +1783,9 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 	it := newInsertIterator(chain, results, bc.validator)
 
 	block, err := it.next()
+	if err != nil {
+		log.Debug("error in ", "err", err)
+	}
 
 	// Left-trim all the known blocks
 	if err == ErrKnownBlock {
@@ -1804,6 +1808,9 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 			stats.ignored++
 
 			block, err = it.next()
+			if err != nil {
+				log.Debug("error in ", "err", err)
+			}
 		}
 		// The remaining blocks are still known blocks, the only scenario here is:
 		// During the fast sync, the pivot point is already submitted but rollback
@@ -1816,11 +1823,15 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 		for block != nil && err == ErrKnownBlock {
 			log.Debug("Writing previously known block", "number", block.Number(), "hash", block.Hash())
 			if err := bc.writeKnownBlock(block); err != nil {
+				log.Debug("error in ", "err", err)
 				return it.index, err
 			}
 			lastCanon = block
 
 			block, err = it.next()
+			if err != nil {
+				log.Debug("error in ", "err", err)
+			}
 		}
 		// Falls through to the block import
 	}
@@ -1835,9 +1846,13 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 		for block != nil && (it.index == 0 || errors.Is(err, consensus.ErrUnknownAncestor)) {
 			log.Debug("Future block, postponing import", "number", block.Number(), "hash", block.Hash())
 			if err := bc.addFutureBlock(block); err != nil {
+				log.Debug("error in ", "err", err)
 				return it.index, err
 			}
 			block, err = it.next()
+			if err != nil {
+				log.Debug("error in ", "err", err)
+			}
 		}
 		stats.queued += it.processed()
 		stats.ignored += it.remaining()
@@ -1866,6 +1881,9 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 
 	for ; block != nil && err == nil || err == ErrKnownBlock; block, err = it.next() {
 		// If the chain is terminating, stop processing blocks
+		if err != nil {
+			log.Debug("error in ", "err", err)
+		}
 		if bc.insertStopped() {
 			log.Debug("Abort during block processing")
 			break
@@ -1904,6 +1922,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 					"hash", block.Hash(), "number", block.NumberU64())
 			}
 			if err := bc.writeKnownBlock(block); err != nil {
+				log.Debug("error in", "err", err)
 				return it.index, err
 			}
 			stats.processed++
@@ -1946,12 +1965,16 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 					}
 				}(time.Now(), followup, throwaway, &followupInterrupt)
 			}
+			if err != nil {
+				log.Debug("error in ", "err", err)
+			}
 		}
 
 		// Process block using the parent state as reference point
 		substart := time.Now()
 		receipts, logs, usedGas, err := bc.processor.Process(block, statedb, bc.vmConfig)
 		if err != nil {
+			log.Debug("error in ", "err", err)
 			bc.reportBlock(block, receipts, err)
 			atomic.StoreUint32(&followupInterrupt, 1)
 			return it.index, err
@@ -1978,6 +2001,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 		// Validate the state using the default validator
 		substart = time.Now()
 		if err := bc.validator.ValidateState(block, statedb, receipts, usedGas); err != nil {
+			log.Debug("error in ", "err", err)
 			bc.reportBlock(block, receipts, err)
 			atomic.StoreUint32(&followupInterrupt, 1)
 			return it.index, err
@@ -2042,18 +2066,17 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 	// Any blocks remaining here? The only ones we care about are the future ones
 	if block != nil && errors.Is(err, consensus.ErrFutureBlock) {
 		if err := bc.addFutureBlock(block); err != nil {
-			log.Debug("error in addFutureBlock 2045")
+			log.Debug("error in addFutureBlock")
 			return it.index, err
 		}
 		block, err = it.next()
-
 		if err != nil {
-			log.Debug("error in it next 2051", "err", err)
+			log.Debug("error in it next ", "err", err)
 		}
 
 		for ; block != nil && errors.Is(err, consensus.ErrUnknownAncestor); block, err = it.next() {
 			if err != nil {
-				log.Debug("error in it next 2055", "err", err)
+				log.Debug("error in it next", "err", err)
 			}
 			if err := bc.addFutureBlock(block); err != nil {
 				log.Debug("error in addFutureBlock 2052")
@@ -2066,7 +2089,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 	if err != nil {
 		log.Debug("error in end", "err", err)
 	}
-
+	log.PrintOrigins(false)
 	return it.index, err
 }
 
