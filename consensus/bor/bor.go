@@ -362,8 +362,13 @@ func (c *Bor) verifyHeader(chain consensus.ChainHeaderReader, header *types.Head
 	if err := misc.VerifyForkHashes(chain.Config(), header, false); err != nil {
 		return err
 	}
+
 	// All basic checks passed, verify cascading fields
-	return c.verifyCascadingFields(chain, header, parents)
+	err := c.verifyCascadingFields(chain, header, parents)
+	if err != nil {
+		log.Debug("error in  verifyCascadingFields")
+	}
+	return err
 }
 
 // validateHeaderExtraField validates that the extra-data contains both the vanity and signature.
@@ -454,7 +459,11 @@ func (c *Bor) verifyCascadingFields(chain consensus.ChainHeaderReader, header *t
 	}
 
 	// All basic checks passed, verify the seal and return
-	return c.verifySeal(chain, header, parents)
+	err = c.verifySeal(chain, header, parents)
+	if err != nil {
+		log.Debug("error in  verifySeal")
+	}
+	return err
 }
 
 // snapshot retrieves the authorization snapshot at a given point in time.
