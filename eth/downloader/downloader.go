@@ -827,7 +827,7 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 func (d *Downloader) findAncestorSpanSearch(p *peerConnection, mode SyncMode, remoteHeight, localHeight uint64, floor int64) (commonAncestor uint64, err error) {
 	from, count, skip, max := calculateRequestSpan(remoteHeight, localHeight)
 
-	p.log.Trace("Span searching for common ancestor", "count", count, "from", from, "skip", skip)
+	p.log.Debug("Span searching for common ancestor", "count", count, "from", from, "skip", skip)
 	go p.peer.RequestHeadersByNumber(uint64(from), count, skip, false)
 
 	// Wait for the remote response to the head fetch
@@ -882,6 +882,7 @@ func (d *Downloader) findAncestorSpanSearch(p *peerConnection, mode SyncMode, re
 					known = d.lightchain.HasHeader(h, n)
 				}
 				if known {
+					p.log.Debug("know ", "number", number, "hash", hash)
 					number, hash = n, h
 					break
 				}
@@ -902,7 +903,7 @@ func (d *Downloader) findAncestorSpanSearch(p *peerConnection, mode SyncMode, re
 			p.log.Warn("Ancestor below allowance", "number", number, "hash", hash, "allowance", floor)
 			return 0, errInvalidAncestor
 		}
-		p.log.Debug("Found common ancestor", "number", number, "hash", hash)
+		p.log.Debug("Found common ancestor blade", "number", number, "hash", hash)
 		return number, nil
 	}
 	return 0, errNoAncestorFound
